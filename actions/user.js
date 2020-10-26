@@ -1,4 +1,4 @@
-import myBase from "../config/MyBase";
+import myBase, { db } from "../config/MyBase";
 
 export const UPDATE_EMAIL = "UPDATE_EMAIL";
 export const UPDATE_PASSWORD = "UPDATE_PASSWORD";
@@ -28,7 +28,18 @@ export const login = () => {
                 .signInWithEmailAndPassword(email, password);
             dispatch({ type: LOGIN, payload: response.user });
         } catch (e) {
-            console.log(e);
+            alert(e);
+        }
+    };
+};
+
+export const getUser = (uid) => {
+    return async (dispatch, getState) => {
+        try {
+            const user = await db.collection("users").doc(uid).get();
+            dispatch({ type: LOGIN, payload: user.data() });
+        } catch (e) {
+            alert(e);
         }
     };
 };
@@ -40,9 +51,16 @@ export const signup = () => {
             const response = await myBase
                 .auth()
                 .createUserWithEmailAndPassword(email, password);
-            dispatch({ type: SIGNUP, payload: response.user });
+            if (response.user.uid) {
+                const user = {
+                    uid: response.user.uid,
+                    email: email,
+                };
+                db.collection("users").doc(response.user.uid).set(user);
+                dispatch({ type: SIGNUP, payload: user });
+            }
         } catch (e) {
-            console.log(e);
+            alert(e);
         }
     };
 };
