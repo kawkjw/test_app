@@ -1,4 +1,5 @@
 import firebase from "firebase";
+import "firebase/firestore";
 import {
     API_KEY,
     AUTH_DOMAIN,
@@ -24,3 +25,8 @@ var firebaseConfig = {
 const myBase = firebase.initializeApp(firebaseConfig);
 
 export default myBase;
+export const db = myBase.firestore();
+
+db.settings({
+    timestampsInSnapshots: true,
+});
